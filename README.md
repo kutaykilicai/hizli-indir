@@ -4,6 +4,17 @@ Windows için çok bağlantılı indirme yöneticisi. Kullanımı IDM'e benzer: 
 
 Yazar: Kutay Kılıç
 
+## Ekran görüntüleri
+
+![Ana pencere: indirme listesi](docs/ana-pencere.png)
+
+Ana pencerede indirmeler kategoriye ve duruma göre listelenir. Aşağıda solda bir indirmenin ilerleme penceresi var; alttaki şeritte her bağlantının dosyanın hangi bölümünü indirdiği görünüyor. Sağda ayarların Bağlantı bölümü.
+
+<p>
+  <img src="docs/ilerleme.png" alt="İndirme ilerleme penceresi" width="39%">
+  <img src="docs/ayarlar.png" alt="Ayarlar, Bağlantı bölümü" width="58%">
+</p>
+
 ## Neler var
 
 - Tek dosyayı 1 ile 32 arasında bağlantıyla indirme (varsayılan 16). Bir bölüm bitince en büyük kalan bölüm ikiye bölünür, böylece son saniyelerde tek bağlantıya düşülmez.
