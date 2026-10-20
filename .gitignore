@@ -1,0 +1,18 @@
+bin/
+obj/
+.vs/
+*.user
+dist/
+*.zip
+
+# Local secrets, user config and real-data screenshots (keep out of commits)
+.env
+.env.*
+!.env.example
+*.local.json
+ayarlar.json
+config.json
+settings.local.*
+user-config/
+screenshots/private/
+screenshots/real/

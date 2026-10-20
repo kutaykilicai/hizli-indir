@@ -1,0 +1,53 @@
+<Window x:Class="HizliIndir.UI.DownloadInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="İndirme bilgisi" Width="620" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True">
+    <StackPanel Margin="20">
+        <DockPanel>
+            <Border Width="44" Height="44" CornerRadius="12" Background="{DynamicResource Selected}" Margin="0,0,14,0">
+                <TextBlock x:Name="TypeGlyph" Style="{StaticResource Icon}" FontSize="20" Foreground="{StaticResource Accent}"/>
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock x:Name="Heading" Text="İndirme bilgisi" Style="{StaticResource Title}" FontSize="18"/>
+                <TextBlock x:Name="SizeText" Text="Dosya bilgisi alınıyor" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+            </StackPanel>
+        </DockPanel>
+
+        <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="110"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <TextBlock Text="Adres" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+                <TextBox x:Name="UrlBox" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,4"/>
+                <TextBlock Grid.Row="1" Text="Kategori" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+                <ComboBox x:Name="CategoryBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,4" SelectionChanged="Category_Changed"/>
+                <TextBlock Grid.Row="2" Text="Kayıt yeri" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+                <TextBox x:Name="FolderBox" Grid.Row="2" Grid.Column="1" Margin="0,4"/>
+                <Button Grid.Row="2" Grid.Column="2" Content="Gözat" Margin="8,4,0,4" Click="Browse_Click"/>
+                <TextBlock Grid.Row="3" Text="Dosya adı" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+                <TextBox x:Name="NameBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,4"/>
+                <TextBlock Grid.Row="4" Text="Açıklama" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+                <TextBox x:Name="DescBox" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,4"/>
+                <TextBlock Grid.Row="5" Text="Bağlantı" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+                <StackPanel Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,4">
+                    <ComboBox x:Name="ConnBox" Width="110"/>
+                    <CheckBox x:Name="RememberBox" Content="Bu yolu hatırla" Margin="16,0,0,0" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="OpenBox" Content="Bitince aç" Margin="16,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TextBlock x:Name="Details" Style="{StaticResource Caption}" Margin="2,10,0,0" TextWrapping="Wrap"/>
+
+        <DockPanel Margin="0,18,0,0">
+            <StackPanel x:Name="LaterPanel" Orientation="Horizontal">
+                <Button x:Name="LaterBtn" Content="Sonra indir" Click="Later_Click"/>
+                <ComboBox x:Name="QueueBox" Width="150" Margin="8,0,0,0" DisplayMemberPath="Name"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Vazgeç" IsCancel="True" Margin="0,0,8,0" Click="Cancel_Click"/>
+                <Button x:Name="StartBtn" Content="İndirmeyi başlat" IsDefault="True" Click="Start_Click"/>
+            </StackPanel>
+        </DockPanel>
+    </StackPanel>
+</Window>

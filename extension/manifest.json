@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Hızlı İndir Tarayıcı Eklentisi",
+  "short_name": "Hızlı İndir",
+  "version": "1.0.0",
+  "description": "İndirmeleri ve sayfadaki videoları Hızlı İndir'e gönderir.",
+  "author": "Kutay Kılıç",
+  "minimum_chrome_version": "116",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApMF+svH/5Py1ml8f8JPSMD2c11s2K5n3Uw952Xdy1Nf7tZ5W+yCKHEl4hu+t/eatsrgd6eBWoTyAW+10o2nk1S5tqfncnjKl1RWTxOh5ZQbC3TxGt3NacJZRzJtZWz20MT7Y0XXaYko2mpMSMYxOGCNsaNwAxl3TvDyfYLhZCEEB0m3gK9DpS/Oz82GIsTzhhRz2AYN2j0CEhCY7A6H11wdwrqKR44PteVEZtctxAu4hMUlJQtN1fZRc0Z5Rp9FtsBOZffuVXLJaUgy/BWeaJvkk+c0pA6Hyoj9AfOJfAhxXX+mVJuQzP3clpmTtFK2c4tY9npbBb/HPEupzdyZdrQIDAQAB",
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "action": { "default_title": "Hızlı İndir", "default_popup": "popup.html", "default_icon": { "16": "icons/16.png", "32": "icons/32.png" } },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "permissions": ["downloads", "nativeMessaging", "cookies", "contextMenus", "storage", "webRequest", "tabs", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    { "matches": ["http://*/*", "https://*/*"], "js": ["content.js"], "run_at": "document_idle", "all_frames": true }
+  ]
+}

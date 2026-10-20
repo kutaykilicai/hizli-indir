@@ -1,0 +1,31 @@
+<Window x:Class="HizliIndir.UI.BatchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Toplu indirme" Width="620" Height="560" WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock Text="Toplu indirme" Style="{StaticResource Title}"/>
+            <TextBlock Text="Sıralı adları olan dosyalar için adresteki değişen kısmın yerine * yazın. Örnek: https://ornek.com/resim*.jpg" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,4,0,12"/>
+            <TextBox x:Name="PatternBox" TextChanged="Changed"/>
+            <StackPanel Orientation="Horizontal" Margin="0,12,0,12">
+                <Border Style="{StaticResource PillGroup}" Margin="0,0,14,0">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="Numbers" Style="{StaticResource Pill}" Content="Sayı" GroupName="k" IsChecked="True" Checked="Changed"/>
+                        <RadioButton x:Name="Letters" Style="{StaticResource Pill}" Content="Harf" GroupName="k" Checked="Changed"/>
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="Başla" VerticalAlignment="Center" Margin="0,0,6,0"/><TextBox x:Name="FromBox" Width="60" Text="1" TextChanged="Changed"/>
+                <TextBlock Text="Bitir" VerticalAlignment="Center" Margin="12,0,6,0"/><TextBox x:Name="ToBox" Width="60" Text="10" TextChanged="Changed"/>
+                <TextBlock Text="Basamak" VerticalAlignment="Center" Margin="12,0,6,0"/><TextBox x:Name="WidthBox" Width="50" Text="1" TextChanged="Changed"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Vazgeç" IsCancel="True" Margin="0,0,8,0"/>
+            <Button Content="Kuyruğa ekle" Margin="0,0,8,0" Click="Queue_Click"/>
+            <Button Content="İndir" IsDefault="True" Click="Start_Click"/>
+        </StackPanel>
+        <Border Style="{StaticResource Card}" Padding="6">
+            <ListBox x:Name="Preview" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Text}"/>
+        </Border>
+    </DockPanel>
+</Window>

@@ -1,0 +1,326 @@
+<Window x:Class="HizliIndir.UI.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ayarlar" Width="860" Height="640" MinWidth="760" MinHeight="520" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <Style x:Key="PageHeader" TargetType="TextBlock" BasedOn="{StaticResource Title}">
+            <Setter Property="Margin" Value="0,0,0,14"/>
+        </Style>
+        <Style x:Key="Group" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="210"/><ColumnDefinition/></Grid.ColumnDefinitions>
+        <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <ListBox x:Name="Nav" Style="{StaticResource SideList}" Margin="12,16,6,12" SelectionChanged="Nav_Changed">
+            <ListBoxItem Tag="General"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE713;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Genel"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Browser"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE774;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Tarayıcı ve dosya türleri"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Save"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8B7;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Kaydetme ve kategoriler"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Connection"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE968;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Bağlantı"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Proxy"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE12B;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Vekil sunucu"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Sites"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE72E;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Site şifreleri"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Video"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Video"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="Extra"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE83D;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Sesler ve virüs denetimi"/></StackPanel></ListBoxItem>
+        </ListBox>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="6,16,12,0">
+            <Grid Margin="0,0,8,12">
+                <!-- Genel -->
+                <StackPanel x:Name="General">
+                    <TextBlock Text="Genel" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <CheckBox x:Name="StartupBox" Content="Windows açılınca bildirim alanında başlat"/>
+                            <CheckBox x:Name="TrayBox" Content="Kapatınca bildirim alanında çalışmaya devam et"/>
+                            <CheckBox x:Name="ClipBox" Content="Panoya kopyalanan indirme bağlantılarını yakala"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Görünüm" Style="{StaticResource Subtitle}"/>
+                            <Border Style="{StaticResource PillGroup}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="ThemeSystem" Style="{StaticResource Pill}" Content="Windows'a uy" GroupName="th"/>
+                                    <RadioButton x:Name="ThemeLight" Style="{StaticResource Pill}" Content="Açık" GroupName="th"/>
+                                    <RadioButton x:Name="ThemeDark" Style="{StaticResource Pill}" Content="Koyu" GroupName="th"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Pencereler ve bildirimler" Style="{StaticResource Subtitle}"/>
+                            <CheckBox x:Name="StartDlgBox" Content="İndirmeden önce dosya bilgisi penceresini göster"/>
+                            <CheckBox x:Name="ProgDlgBox" Content="İndirme ilerleme penceresini göster"/>
+                            <CheckBox x:Name="DoneDlgBox" Content="İndirme bitince tamamlandı penceresini göster"/>
+                            <CheckBox x:Name="NotifyBox" Content="Windows bildirimleri göster"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="İçe aktar" Click="ImportIdm_Click"/>
+                            <StackPanel>
+                                <TextBlock Text="Önceki indirme yöneticisinden klasörler" FontWeight="SemiBold"/>
+                                <TextBlock Text="Bilgisayarda IDM ayarları varsa kategori klasörleri ve uzantı listeleri buraya alınır." Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,2,12,0"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Tarayıcı -->
+                <StackPanel x:Name="Browser" Visibility="Collapsed">
+                    <TextBlock Text="Tarayıcı ve dosya türleri" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <DockPanel>
+                                <Border x:Name="HostDot" Width="10" Height="10" CornerRadius="5" Background="{StaticResource Success}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="HostText" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,8,0,10">
+                                Chrome ya da Edge'de eklentiler sayfasını açın, geliştirici modunu açın, "Paketlenmemiş öğe yükle" ile aşağıdaki klasörü seçin. Eklenti indirmeleri yakalar ve Hızlı İndir'e gönderir. İndirme sırasında Alt tuşuna basılı tutarsanız tarayıcının kendisi indirir.
+                            </TextBlock>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Content="Yeniden kaydet" Margin="8,0,0,0" Click="Register_Click"/>
+                                <Button DockPanel.Dock="Right" Content="Klasörü aç" Margin="8,0,0,0" Click="ExtFolder_Click"/>
+                                <TextBox x:Name="ExtPath" IsReadOnly="True"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Bu uzantıdaki dosyaları otomatik yakala" Style="{StaticResource Subtitle}"/>
+                            <TextBox x:Name="CaptureBox" TextWrapping="Wrap" AcceptsReturn="False" MinHeight="80" VerticalContentAlignment="Top"/>
+                            <TextBlock Text="Uzantıları boşlukla ayırın. Yıldız kullanılabilir, örneğin r0*." Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Bu sitelerden otomatik indirme yapma" Style="{StaticResource Subtitle}"/>
+                            <TextBox x:Name="SkipBox" TextWrapping="Wrap" MinHeight="50" VerticalContentAlignment="Top"/>
+                            <TextBlock Text="Video düğmesini bu sitelerde gösterme" Style="{StaticResource Subtitle}" Margin="0,12,0,6"/>
+                            <TextBox x:Name="NoPanelBox" TextWrapping="Wrap" MinHeight="50" VerticalContentAlignment="Top"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <TextBlock Text="Şundan küçük dosyaları yakalama:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBox x:Name="MinSizeBox" Width="80"/>
+                                <TextBlock Text="KB" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Kaydetme -->
+                <StackPanel x:Name="Save" Visibility="Collapsed">
+                    <TextBlock Text="Kaydetme ve kategoriler" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Ana indirme klasörü" Style="{StaticResource Subtitle}"/>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Content="Gözat" Margin="8,0,0,0" Click="BaseBrowse_Click"/>
+                                <TextBox x:Name="BaseBox"/>
+                            </DockPanel>
+                            <TextBlock Text="Kategorisi olmayan dosyalar bu klasörün içindeki Genel klasörüne kaydedilir." Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+                            <CheckBox x:Name="RememberBox" Content="Genel kategori için son seçilen klasörü hatırla" Margin="0,10,0,0"/>
+                            <TextBlock Text="Geçici / kısmi klasör (.hizli)" Style="{StaticResource Subtitle}" Margin="0,14,0,0"/>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Content="Gözat" Margin="8,0,0,0" Click="TempBrowse_Click"/>
+                                <TextBox x:Name="TempBox"/>
+                            </DockPanel>
+                            <TextBlock Text="Aynı sürücüde bitiş anında taşınır (kopyalama yok). IDM artıkları bu klasörde bırakılır; Hızlı İndir kendi alt klasörünü kullanır." Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="Kategoriler" Style="{StaticResource Subtitle}" VerticalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Content="Yeni" Margin="0,0,6,0" Click="CatNew_Click"/>
+                                    <Button Content="Düzenle" Margin="0,0,6,0" Click="CatEdit_Click"/>
+                                    <Button Content="Sil" Click="CatDelete_Click"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <ListView x:Name="CatList" Height="180" MouseDoubleClick="CatEdit_Click">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Ad" Width="120" DisplayMemberBinding="{Binding Name}"/>
+                                        <GridViewColumn Header="Klasör" Width="220" DisplayMemberBinding="{Binding Folder}"/>
+                                        <GridViewColumn Header="Uzantılar" Width="220" DisplayMemberBinding="{Binding ExtText}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Aynı adda dosya varsa" Style="{StaticResource Subtitle}"/>
+                            <Border Style="{StaticResource PillGroup}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="DupRename" Style="{StaticResource Pill}" Content="Yeni ad ver" GroupName="dup"/>
+                                    <RadioButton x:Name="DupOverwrite" Style="{StaticResource Pill}" Content="Üzerine yaz" GroupName="dup"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Bağlantı -->
+                <StackPanel x:Name="Connection" Visibility="Collapsed">
+                    <TextBlock Text="Bağlantı" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Azami bağlantı sayısı" Style="{StaticResource Subtitle}"/>
+                            <DockPanel>
+                                <ComboBox x:Name="MaxConnBox" Width="110" DockPanel.Dock="Right"/>
+                                <TextBlock Text="Varsayılan azami bağlantı sayısı" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Text="Bölümler dosyadaki yerlerine doğrudan yazıldığı için bağlantı sayısını artırmak indirme sonunda bekleme yaratmaz." Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,6,0,12"/>
+                            <TextBlock Text="İstisnalar" Style="{StaticResource Subtitle}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <ListView x:Name="ExceptionList" Height="150" SelectionChanged="Exception_Selection" MouseDoubleClick="ExEdit_Click">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Sunucu" Width="300" DisplayMemberBinding="{Binding Host}"/>
+                                            <GridViewColumn Header="Sayı" Width="80" DisplayMemberBinding="{Binding Connections}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                    <Button Content="Yeni" Margin="0,0,0,6" Click="ExNew_Click"/>
+                                    <Button x:Name="ExDelete" Content="Sil" Margin="0,0,0,6" IsEnabled="False" Click="ExDelete_Click"/>
+                                    <Button x:Name="ExEdit" Content="Düzenle" IsEnabled="False" Click="ExEdit_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <CheckBox x:Name="LimitBox" Content="İndirme sınırları" FontWeight="SemiBold" Checked="LimitToggle" Unchecked="LimitToggle"/>
+                            <StackPanel x:Name="LimitPanel" Margin="26,8,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Şundan fazla indirme:" Width="150" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="LimitMb" Width="80"/>
+                                    <TextBlock Text="MB" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <TextBlock Text="her" Width="150" VerticalAlignment="Center" TextAlignment="Right" Padding="0,0,10,0"/>
+                                    <TextBox x:Name="LimitHours" Width="80"/>
+                                    <TextBlock Text="saat" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                </StackPanel>
+                                <CheckBox x:Name="LimitWarn" Content="İndirmeleri durdurmadan önce uyarı göster" Margin="0,10,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Gelişmiş" Style="{StaticResource Subtitle}"/>
+                            <DockPanel Margin="0,2"><TextBox x:Name="ParallelBox" Width="80" DockPanel.Dock="Right"/><TextBlock Text="Bir kuyrukta aynı anda indirilecek dosya" VerticalAlignment="Center"/></DockPanel>
+                            <DockPanel Margin="0,4"><TextBox x:Name="RetryBox" Width="80" DockPanel.Dock="Right"/><TextBlock Text="Kopan bağlantıyı yeniden deneme sayısı" VerticalAlignment="Center"/></DockPanel>
+                            <DockPanel Margin="0,4"><TextBox x:Name="TimeoutBox" Width="80" DockPanel.Dock="Right"/><TextBlock Text="Zaman aşımı (saniye)" VerticalAlignment="Center"/></DockPanel>
+                            <CheckBox x:Name="Http2Box" Content="HTTP/2 tercih et (tek bağlantıda çoğullama, genelde daha yavaş)"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Vekil -->
+                <StackPanel x:Name="Proxy" Visibility="Collapsed">
+                    <TextBlock Text="Vekil sunucu" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <Border Style="{StaticResource PillGroup}" Margin="0,0,0,12">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="ProxyNone" Style="{StaticResource Pill}" Content="Kullanma" GroupName="px"/>
+                                    <RadioButton x:Name="ProxySystem" Style="{StaticResource Pill}" Content="Windows ayarı" GroupName="px"/>
+                                    <RadioButton x:Name="ProxyManual" Style="{StaticResource Pill}" Content="Elle" GroupName="px"/>
+                                </StackPanel>
+                            </Border>
+                            <Grid IsEnabled="{Binding IsChecked, ElementName=ProxyManual}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="130"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <TextBlock Text="Adres" VerticalAlignment="Center"/><TextBox x:Name="PxHost" Grid.Column="1" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Text="Kapı" VerticalAlignment="Center"/><TextBox x:Name="PxPort" Grid.Row="1" Grid.Column="1" Width="90" HorizontalAlignment="Left" Margin="0,3"/>
+                                <TextBlock Grid.Row="2" Text="Kullanıcı" VerticalAlignment="Center"/><TextBox x:Name="PxUser" Grid.Row="2" Grid.Column="1" Margin="0,3"/>
+                                <TextBlock Grid.Row="3" Text="Şifre" VerticalAlignment="Center"/><PasswordBox x:Name="PxPass" Grid.Row="3" Grid.Column="1" Margin="0,3"/>
+                                <TextBlock Grid.Row="4" Text="Kullanılmayacak" VerticalAlignment="Center"/><TextBox x:Name="PxBypass" Grid.Row="4" Grid.Column="1" Margin="0,3"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Siteler -->
+                <StackPanel x:Name="Sites" Visibility="Collapsed">
+                    <TextBlock Text="Site şifreleri" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <TextBlock Text="Bu sitelerden indirirken kullanıcı adı ve şifre gönderilir. Şifreler Windows hesabınıza bağlı olarak şifrelenir." Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <ListView x:Name="LoginList" Height="200">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Site" Width="300" DisplayMemberBinding="{Binding Pattern}"/>
+                                            <GridViewColumn Header="Kullanıcı" Width="150" DisplayMemberBinding="{Binding User}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                    <Button Content="Yeni" Margin="0,0,0,6" Click="LoginNew_Click"/>
+                                    <Button Content="Sil" Click="LoginDelete_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Video -->
+                <StackPanel x:Name="Video" Visibility="Collapsed">
+                    <TextBlock Text="Video" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <DockPanel Margin="0,2"><ComboBox x:Name="QualityBox" Width="190" DockPanel.Dock="Right" DisplayMemberPath="Label"/><TextBlock Text="Varsayılan kalite" VerticalAlignment="Center"/></DockPanel>
+                            <DockPanel Margin="0,6"><TextBox x:Name="FragBox" Width="80" DockPanel.Dock="Right"/><TextBlock Text="Aynı anda çekilecek parça sayısı" VerticalAlignment="Center"/></DockPanel>
+                            <CheckBox x:Name="YtUpdateBox" Content="yt-dlp'yi her gün kendiliğinden güncelle"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" x:Name="ToolsBtn" Content="Şimdi hazırla" Click="Tools_Click"/>
+                            <StackPanel>
+                                <TextBlock Text="Video araçları" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="ToolsText" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,2,12,0"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Ek -->
+                <StackPanel x:Name="Extra" Visibility="Collapsed">
+                    <TextBlock Text="Sesler ve virüs denetimi" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <CheckBox x:Name="SoundBox" Content="Olaylarda ses çal"/>
+                            <TextBlock Text="İndirme bitince (wav, boş bırakılırsa Windows sesi)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+                            <TextBox x:Name="SoundOk"/>
+                            <TextBlock Text="İndirme hatayla durunca" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+                            <TextBox x:Name="SoundFail"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <CheckBox x:Name="VirusBox" Content="İndirme bitince virüs taraması yap"/>
+                            <TextBlock Text="Tarayıcı programı" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+                            <TextBox x:Name="VirusExe"/>
+                            <TextBlock Text="Parametreler ([DOSYA] indirilen dosyanın yolu olur)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+                            <TextBox x:Name="VirusArgs"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,16">
+            <Button Content="Vazgeç" IsCancel="True" Margin="0,0,8,0"/>
+            <Button Content="Kaydet" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

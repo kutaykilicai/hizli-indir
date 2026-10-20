@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/32.png" alt="">
+    <div>
+      <h1>Hızlı İndir</h1>
+      <p id="status">Bağlanıyor</p>
+    </div>
+  </header>
+  <section class="card">
+    <label class="row"><span>İndirmeleri yakala</span><input type="checkbox" id="enabled" class="switch"></label>
+    <label class="row"><span id="siteLabel">Bu sitede kapat</span><input type="checkbox" id="site" class="switch"></label>
+  </section>
+  <section>
+    <h2>Bu sayfadaki medya</h2>
+    <div id="media" class="list"><p class="empty">Henüz video akışı görülmedi.</p></div>
+  </section>
+  <div class="actions">
+    <button id="pageVideo" class="primary">Sayfadaki videoyu indir</button>
+    <button id="open">Uygulamayı aç</button>
+  </div>
+  <p class="hint">İndirirken Alt tuşunu basılı tutarsanız dosya tarayıcıda kalır.</p>
+  <script src="popup.js"></script>
+</body>
+</html>
