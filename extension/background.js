@@ -123,6 +123,28 @@ async function siteDisabled(url) {
   return s.disabledSites.includes(h);
 }
 
+// ---------- Gofile ----------
+// Gofile dosya bağlantıları store*.gofile.io/download/... biçimindedir ve accountToken
+// çerezini (gofile.io alanında) ister. Misafir indirmeleri IP başına sınırlıdır; çok sayıda
+// paralel bağlantı 429/403 ile reddedilir. Bu yüzden normal bir ziyaretçi gibi en fazla
+// 2 bağlantı kullanırız ve yönlendiren olarak gofile.io göndeririz.
+const GOFILE_CONNECTIONS = 2;
+function isGofileDownload(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && /(^|\.)gofile\.io$/i.test(u.hostname) && u.hostname !== "gofile.io" && u.hostname !== "api.gofile.io" && /^\/download\//.test(u.pathname);
+  } catch { return false; }
+}
+async function gofileExtras(url, referer) {
+  const cookies = await cookieHeader(url);
+  return {
+    cookies,
+    referer: referer && /^https:\/\/gofile\.io\//.test(referer) ? referer : "https://gofile.io/",
+    connections: GOFILE_CONNECTIONS,
+    headers: { Origin: "https://gofile.io" },
+  };
+}
+
 // ---------- İndirme yakalama ----------
 function shouldCapture(item, cfg) {
   const url = item.finalUrl || item.url || "";
@@ -131,6 +153,7 @@ function shouldCapture(item, cfg) {
   if (Date.now() < altUntil) return false;
   const host = hostOf(url);
   if (cfg.skipSites.some((p) => wildcard(p, host))) return false;
+  if (isGofileDownload(url)) return true;            // Gofile dosyaları her uzantıda yakalanır
   const ext = extOf(item.filename) || extOf(nameFromUrl(url));
   if (!ext || !cfg.capture.some((p) => wildcard(p, ext))) return false;
   const size = item.fileSize > 0 ? item.fileSize : item.totalBytes;
@@ -156,6 +179,7 @@ async function handOver(item) {
     cookies: await cookieHeader(url),
     userAgent: navigator.userAgent,
   };
+  if (isGofileDownload(url)) Object.assign(msg, await gofileExtras(url, msg.referer));
   const body = postBodies.get(item.url) || postBodies.get(url);
   if (body) msg.postData = body;
   const r = await native(msg);
@@ -287,6 +311,22 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
       case "send-media":
         reply(await sendVideo({ pageUrl: msg.pageUrl, target: msg.url, title: msg.title, quality: msg.quality }, msg.pageUrl));
         break;
+      case "gofile-files": {
+        const page = msg.pageUrl || sender.tab?.url || "https://gofile.io/";
+        const items = (msg.items || []).filter((x) => x && isGofileDownload(x.url)).slice(0, 500);
+        if (!items.length) { reply({ ok: false, error: "indirilebilir dosya yok" }); break; }
+        let sent = 0, error = "";
+        for (const it of items) {
+          const r = await native({
+            type: "download", url: it.url, pageUrl: page, filename: it.name || nameFromUrl(it.url),
+            size: it.size > 0 ? it.size : undefined, userAgent: navigator.userAgent,
+            silent: items.length > 1, ...(await gofileExtras(it.url, page)),
+          });
+          if (r.ok) sent++; else error = r.error || "uygulamaya ulaşılamadı";
+        }
+        reply({ ok: sent > 0, sent, error });
+        break;
+      }
       case "open-app":
         reply(await native({ type: "show" }));
         break;
@@ -331,7 +371,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   const page = info.pageUrl || tab?.url;
   const send = async (url, extra = {}) => native({
     type: "download", url, referer: info.frameUrl || page, pageUrl: page,
-    cookies: await cookieHeader(url), userAgent: navigator.userAgent, ...extra,
+    cookies: await cookieHeader(url), userAgent: navigator.userAgent,
+    ...(isGofileDownload(url) ? await gofileExtras(url, page) : {}), ...extra,
   });
   switch (info.menuItemId) {
     case "link": await send(info.linkUrl); break;
