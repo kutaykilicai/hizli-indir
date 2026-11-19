@@ -12,6 +12,7 @@ public sealed class DownloadManager
         public required CancellationTokenSource Cts;
         public HttpJob? Http;
         public VideoJob? Video;
+        public TorrentJob? Torrent;
         public Task? Task;
         public long LastBytes;
         public long LastTicks = Stopwatch.GetTimestamp();
@@ -43,7 +44,7 @@ public sealed class DownloadManager
         {
             if (i.IsActive) i.Status = DownloadStatus.Paused;
             if (i.Status == DownloadStatus.Completed && i.Size > 0) i.Downloaded = i.Size;
-            else i.Downloaded = i.Segments.Sum(s => Math.Max(0, Math.Min(s.Done, s.End + 1) - s.Start));
+            else if (i.Kind != DownloadKind.Torrent) i.Downloaded = i.Segments.Sum(s => Math.Max(0, Math.Min(s.Done, s.End + 1) - s.Start));
             CorrectSizeAgainstDisk(i);
             Items.Add(i);
         }
@@ -58,6 +59,7 @@ public sealed class DownloadManager
     {
         var s = App.Settings;
         Limiter.BytesPerSecond = s.SpeedLimitEnabled ? s.SpeedLimitKBps * 1024L : 0;
+        TorrentJob.ApplySpeedLimit();
     }
 
     public void SetOwnLimit(DownloadItem item, long bytesPerSecond)
@@ -69,6 +71,7 @@ public sealed class DownloadManager
 
     public HttpJob? JobOf(DownloadItem item) => _running.TryGetValue(item.Id, out var r) ? r.Http : null;
     public VideoJob? VideoOf(DownloadItem item) => _running.TryGetValue(item.Id, out var r) ? r.Video : null;
+    public TorrentJob? TorrentOf(DownloadItem item) => _running.TryGetValue(item.Id, out var r) ? r.Torrent : null;
     public bool IsRunning(DownloadItem item) => _running.ContainsKey(item.Id);
 
     public void Add(DownloadItem item, bool start)
@@ -94,6 +97,11 @@ public sealed class DownloadManager
             r.Http = new HttpJob(item, Limiter, Usage);
             if (_ownLimits.TryGetValue(item.Id, out var own) && own.BytesPerSecond > 0) r.Http.OwnLimiter = own;
             r.Task = Task.Run(() => r.Http.RunAsync(r.Cts.Token));
+        }
+        else if (item.Kind == DownloadKind.Torrent)
+        {
+            r.Torrent = new TorrentJob(item);
+            r.Task = Task.Run(() => r.Torrent.RunAsync(r.Cts.Token));
         }
         else
         {
@@ -173,6 +181,13 @@ public sealed class DownloadManager
     {
         Pause(item);
         Items.Remove(item);
+        if (item.Kind == DownloadKind.Torrent)
+        {
+            // Torrent dosyaları motor üzerinden kaldırılır; durması için kısa bekle.
+            Task.Delay(400).ContinueWith(_ => TorrentJob.ForgetAsync(item, deleteFile));
+            MarkDirty();
+            return;
+        }
         if (deleteFile)
         {
             Task.Delay(400).ContinueWith(_ =>

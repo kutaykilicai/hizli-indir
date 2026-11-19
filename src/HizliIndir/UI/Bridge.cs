@@ -39,10 +39,37 @@ public static class Bridge
                     }
                     return Ok();
                 }
+            case "torrent":
+                {
+                    var magnet = (string?)msg["magnet"];
+                    if (!TorrentMeta.IsMagnet(magnet)) return Fail("Magnet bağlantısı geçersiz");
+                    Log.Write("Tarayıcıdan magnet bağlantısı");
+                    Dialogs.AddTorrent(magnet, null);
+                    return Ok();
+                }
+            case "torrent-file":
+                {
+                    // Yalnızca uygulamanın ikinci kopyası gönderir (komut satırındaki .torrent dosyası).
+                    var path = (string?)msg["path"];
+                    if (path == null || !TorrentMeta.IsTorrentName(path) || !File.Exists(path)) return Fail("Torrent dosyası yok");
+                    Dialogs.AddTorrentFile(path);
+                    return Ok();
+                }
             case "download":
                 {
+                    if (TorrentMeta.IsMagnet((string?)msg["url"]))
+                    {
+                        Dialogs.AddTorrent((string?)msg["url"], null);
+                        return Ok();
+                    }
                     var item = FromMessage(msg);
                     if (item == null) return Fail("Adres geçersiz");
+                    if (TorrentMeta.IsTorrentName(item.FileName) || (string?)msg["mime"] == "application/x-bittorrent")
+                    {
+                        Log.Write($"Tarayıcıdan .torrent: {item.Url}");
+                        Dialogs.AddTorrentFromWeb(item);
+                        return Ok();
+                    }
                     bool silent = (bool?)msg["silent"] ?? false;
                     Log.Write($"Tarayıcıdan indirme: {item.Url} (çerez: {(string.IsNullOrEmpty(item.Cookies) ? "yok" : item.Cookies.Split(';').Length + " adet")}, yönlendiren: {item.Referer ?? "yok"})");
                     if (silent || !App.Settings.ShowStartDialog)
@@ -105,7 +132,7 @@ public static class Bridge
         {
             ["ok"] = true,
             ["app"] = "Hızlı İndir",
-            ["version"] = "1.0.0",
+            ["version"] = "1.1.0",
             ["capture"] = new JsonArray(s.CaptureExtensions.Select(x => (JsonNode)x).ToArray()),
             ["skipSites"] = new JsonArray(s.SkipSites.Select(x => (JsonNode)x).ToArray()),
             ["noPanelSites"] = new JsonArray(s.NoVideoPanelSites.Select(x => (JsonNode)x).ToArray()),

@@ -21,6 +21,19 @@
   addEventListener("keyup", (e) => { if (e.key === "Alt" && altDown) { altDown = false; send({ type: "alt", down: false }); } }, true);
   addEventListener("mousedown", (e) => { if (e.altKey) send({ type: "alt", down: true }); }, true);
 
+  // ---- Magnet bağlantıları: tıklanınca Hızlı İndir'e gider; Alt ile ya da uygulamaya ulaşılamazsa tarayıcıda kalır ----
+  addEventListener("click", (e) => {
+    const a = e.target instanceof Element ? e.target.closest("a[href^='magnet:']") : null;
+    if (!a || e.altKey || !state.enabled || a.__hizliPass) return;
+    e.preventDefault(); e.stopPropagation();
+    send({ type: "magnet", url: a.href }).then((r) => {
+      if (r && r.ok) return;
+      a.__hizliPass = true;
+      a.click();
+      a.__hizliPass = false;
+    });
+  }, true);
+
   async function loadState() {
     const r = await send({ type: "state", url: top === self ? location.href : undefined, frameUrl: location.href });
     if (r) state = r;

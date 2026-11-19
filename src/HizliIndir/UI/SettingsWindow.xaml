@@ -21,6 +21,7 @@
             <ListBoxItem Tag="Proxy"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE12B;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Vekil sunucu"/></StackPanel></ListBoxItem>
             <ListBoxItem Tag="Sites"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE72E;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Site şifreleri"/></StackPanel></ListBoxItem>
             <ListBoxItem Tag="Video"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE714;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Video"/></StackPanel></ListBoxItem>
+            <ListBoxItem Tag="TorrentPage"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE896;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Torrent"/></StackPanel></ListBoxItem>
             <ListBoxItem Tag="Extra"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE83D;" Style="{StaticResource Icon}" FontSize="14" Width="26" HorizontalAlignment="Left" Foreground="{StaticResource Accent}"/><TextBlock Text="Sesler ve virüs denetimi"/></StackPanel></ListBoxItem>
         </ListBox>
 
@@ -290,6 +291,18 @@
                                 <TextBlock x:Name="ToolsText" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,2,12,0"/>
                             </StackPanel>
                         </DockPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Torrent -->
+                <StackPanel x:Name="TorrentPage" Visibility="Collapsed">
+                    <TextBlock Text="Torrent" Style="{StaticResource PageHeader}"/>
+                    <Border Style="{StaticResource Group}">
+                        <StackPanel>
+                            <DockPanel Margin="0,2"><TextBox x:Name="TorrentPortBox" Width="100" DockPanel.Dock="Right"/><TextBlock Text="Gelen bağlantı bağlantı noktası (TCP ve UDP)" VerticalAlignment="Center"/></DockPanel>
+                            <CheckBox x:Name="TorrentSeedBox" Content="İndirme bitince paylaşmayı sürdür" Margin="0,8,0,0"/>
+                            <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,8,0,0" Text="Hız sınırı torrentlere de uygulanır. Bağlantı noktası değişikliği uygulama yeniden açılınca geçerli olur. Yalnızca indirme hakkınız olan içerikleri indirin."/>
+                        </StackPanel>
                     </Border>
                 </StackPanel>
 

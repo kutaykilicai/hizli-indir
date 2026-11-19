@@ -20,6 +20,7 @@ public static class Converters
         "Müzik" => "\uE8D6",
         "Programlar" => "\uE7B8",
         "Video" => "\uE714",
+        "Torrent" => "\uE896",
         _ => "\uE7C3",
     };
     public static readonly FuncConverter CategoryGlyph = new(v => Glyph(v as string));

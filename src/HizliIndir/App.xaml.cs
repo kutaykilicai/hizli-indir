@@ -28,7 +28,11 @@ public partial class App : Application
         if (!first)
         {
             var url = args.FirstOrDefault(a => a.StartsWith("http", StringComparison.OrdinalIgnoreCase));
-            var msg = url != null ? new JsonObject { ["type"] = "download", ["url"] = url } : new JsonObject { ["type"] = "show" };
+            var magnet = args.FirstOrDefault(TorrentMeta.IsMagnet);
+            var file = args.FirstOrDefault(a => TorrentMeta.IsTorrentName(a) && File.Exists(a));
+            var msg = magnet != null ? new JsonObject { ["type"] = "torrent", ["magnet"] = magnet }
+                : file != null ? new JsonObject { ["type"] = "torrent-file", ["path"] = Path.GetFullPath(file) }
+                : url != null ? new JsonObject { ["type"] = "download", ["url"] = url } : new JsonObject { ["type"] = "show" };
             BridgeServer.TrySend(msg);
             Shutdown();
             return;
@@ -75,6 +79,8 @@ public partial class App : Application
 
         var direct = args.FirstOrDefault(a => a.StartsWith("http", StringComparison.OrdinalIgnoreCase));
         if (direct != null) Dialogs.AddUrl(direct);
+        if (args.FirstOrDefault(TorrentMeta.IsMagnet) is { } magnetArg) Dialogs.AddTorrent(magnetArg, null);
+        foreach (var f in args.Where(a => TorrentMeta.IsTorrentName(a) && File.Exists(a))) Dialogs.AddTorrentFile(f);
     }
 
     void FirstRun()
@@ -121,6 +127,7 @@ public partial class App : Application
     {
         _bridge?.Stop();
         try { Manager?.Save(); } catch { }
+        TorrentJob.Shutdown();
         base.OnExit(e);
     }
 }

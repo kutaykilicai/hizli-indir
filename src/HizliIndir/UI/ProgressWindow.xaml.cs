@@ -74,10 +74,14 @@ public partial class ProgressWindow : Window
         _detailsExpanded = App.Settings.ProgressDetailsExpanded;
         OwnLimitBox.IsEnabled = item.Kind == DownloadKind.Http;
         OwnLimitValue.IsEnabled = item.Kind == DownloadKind.Http;
-        DetailsHeader.Text = item.Kind == DownloadKind.Video
-            ? "Akışlar ve parça ilerlemesi (yt-dlp)"
-            : "Bağlantıların başlangıç noktaları ve ilerlemesi";
-        Segments.Visibility = item.Kind == DownloadKind.Http ? Visibility.Visible : Visibility.Collapsed;
+        DetailsHeader.Text = item.Kind switch
+        {
+            DownloadKind.Video => "Akışlar ve parça ilerlemesi (yt-dlp)",
+            DownloadKind.Torrent => "Dosyalar ve inen parçalar",
+            _ => "Bağlantıların başlangıç noktaları ve ilerlemesi",
+        };
+        Segments.Visibility = item.Kind is DownloadKind.Http or DownloadKind.Torrent ? Visibility.Visible : Visibility.Collapsed;
+        Segments.ShowMarkers = item.Kind == DownloadKind.Http;
         ApplyDetailsVisibility();
         _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(100), DispatcherPriority.Background, (_, _) => Refresh(), Dispatcher);
         _timer.Start();
@@ -110,6 +114,7 @@ public partial class ProgressWindow : Window
         EtaText.Text = string.IsNullOrEmpty(i.EtaText) ? "—" : i.EtaText;
         ResumeText.Text = i.Kind == DownloadKind.Video
             ? "Kısmen (yt-dlp)"
+            : i.Kind == DownloadKind.Torrent ? "Evet"
             : (i.Status == DownloadStatus.Connecting && i.Size <= 0 ? "—" : (i.AcceptRanges ? "Evet" : "Hayır"));
         Bar.Value = pct;
         PauseBtn.Content = i.IsActive ? "Duraklat" : "Devam";
@@ -117,6 +122,7 @@ public partial class ProgressWindow : Window
         if (!_detailsExpanded || StatusTab.Visibility != Visibility.Visible) return;
 
         if (i.Kind == DownloadKind.Video) RefreshVideoRows();
+        else if (i.Kind == DownloadKind.Torrent) RefreshTorrentRows();
         else RefreshHttpRows();
     }
 
@@ -133,6 +139,24 @@ public partial class ProgressWindow : Window
             string info = !string.IsNullOrEmpty(s.Info) ? s.Info
                 : s.Finished ? "Tamamlandı" : s.Active ? "Veri alınıyor…" : "Bekliyor";
             return Row(n + 1, got, info);
+        });
+    }
+
+    void RefreshTorrentRows()
+    {
+        var job = App.Manager.TorrentOf(_item);
+        if (job == null)
+        {
+            SyncRows(1, _ => Row(1, _item.Downloaded, _item.StatusText));
+            return;
+        }
+        var (runs, pieces) = job.Pieces();
+        Segments.Update(runs, Math.Max(1, pieces));
+        var files = job.Files();
+        SyncRows(Math.Min(files.Length, 200), n =>
+        {
+            var f = files[n];
+            return Row(n + 1, (long)(f.size * f.percent / 100), $"%{f.percent:0} {f.name}");
         });
     }
 

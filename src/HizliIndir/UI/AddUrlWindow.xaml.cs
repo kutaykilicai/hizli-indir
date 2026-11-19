@@ -23,9 +23,10 @@ public partial class AddUrlWindow : Window
     void Url_Changed(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
         var t = UrlBox.Text.Trim();
-        bool ok = Uri.TryCreate(t, UriKind.Absolute, out var u) && u.Scheme is "http" or "https" or "ftp";
+        bool magnet = TorrentMeta.IsMagnet(t);
+        bool ok = magnet || (Uri.TryCreate(t, UriKind.Absolute, out var u) && u.Scheme is "http" or "https" or "ftp");
         OkBtn.IsEnabled = ok;
-        Hint.Text = ok && IsVideoPage(t) ? "Bu bir video sayfası. Devam edince kalite seçebilirsiniz." : "";
+        Hint.Text = magnet ? "Magnet bağlantısı. Devam edince dosya listesi alınır." : ok && IsVideoPage(t) ? "Bu bir video sayfası. Devam edince kalite seçebilirsiniz." : "";
     }
 
     void Auth_Changed(object sender, RoutedEventArgs e) => AuthPanel.IsEnabled = AuthBox.IsChecked == true;
@@ -33,7 +34,9 @@ public partial class AddUrlWindow : Window
     void Ok_Click(object sender, RoutedEventArgs e)
     {
         var url = UrlBox.Text.Trim();
-        if (IsVideoPage(url))
+        if (TorrentMeta.IsMagnet(url)) Dialogs.AddTorrent(url, null);
+        else if (TorrentMeta.IsTorrentName(FileNames.FromUrl(url))) Dialogs.AddTorrentFromWeb(new DownloadItem { Url = url });
+        else if (IsVideoPage(url))
         {
             var v = new DownloadItem { Kind = DownloadKind.Video, Url = url, PageUrl = url, FileName = "video", Category = "Video", Folder = Categorizer.FolderOf("Video") };
             new VideoWindow(v).Show();

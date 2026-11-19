@@ -180,6 +180,12 @@ public partial class MainWindow : Window
 
     void Add_Click(object sender, RoutedEventArgs e) => Dialogs.AddUrl(ClipboardUrl());
 
+    void Torrent_Click(object sender, RoutedEventArgs e)
+    {
+        var d = new Microsoft.Win32.OpenFileDialog { Filter = "Torrent dosyası (*.torrent)|*.torrent", Multiselect = true };
+        if (d.ShowDialog(this) == true) foreach (var f in d.FileNames) Dialogs.AddTorrentFile(f);
+    }
+
     void Resume_Click(object sender, RoutedEventArgs e)
     {
         foreach (var i in Selected.Where(i => !i.IsActive && !i.IsCompleted))
@@ -243,12 +249,17 @@ public partial class MainWindow : Window
 
     void List_DragOver(object sender, DragEventArgs e)
     {
-        e.Effects = e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent("UniformResourceLocatorW") ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Effects = e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent("UniformResourceLocatorW") || e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
     void List_Drop(object sender, DragEventArgs e)
     {
+        if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
+        {
+            foreach (var f in files.Where(f => TorrentMeta.IsTorrentName(f))) Dialogs.AddTorrentFile(f);
+            return;
+        }
         var text = e.Data.GetData(DataFormats.UnicodeText) as string ?? e.Data.GetData(DataFormats.Text) as string;
         if (text != null && Uri.TryCreate(text.Trim(), UriKind.Absolute, out _)) Dialogs.AddUrl(text.Trim());
     }

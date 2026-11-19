@@ -4,7 +4,7 @@
         Title="Adres ekle" Width="560" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" ShowInTaskbar="True" Topmost="True">
     <StackPanel Margin="20">
         <TextBlock Text="Yeni indirme" Style="{StaticResource Title}"/>
-        <TextBlock Text="İndirilecek dosyanın ya da video sayfasının adresini girin." Style="{StaticResource Caption}" Margin="0,4,0,14"/>
+        <TextBlock Text="İndirilecek dosyanın, video sayfasının ya da magnet bağlantısının adresini girin." Style="{StaticResource Caption}" Margin="0,4,0,14"/>
         <TextBox x:Name="UrlBox" TextChanged="Url_Changed"/>
         <CheckBox x:Name="AuthBox" Content="Yetkilendirme kullan" Margin="0,12,0,0" Checked="Auth_Changed" Unchecked="Auth_Changed"/>
         <Grid x:Name="AuthPanel" Margin="26,6,0,0" IsEnabled="False">

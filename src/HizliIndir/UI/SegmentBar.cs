@@ -14,6 +14,9 @@ public sealed class SegmentBar : FrameworkElement
     SegmentState[] _segments = Array.Empty<SegmentState>();
     long _size;
 
+    /// <summary>Bölüm başlangıç işaretleri (HTTP). Torrent parça haritasında kapalıdır.</summary>
+    public bool ShowMarkers { get; set; } = true;
+
     public SegmentBar()
     {
         AddVisualChild(_visual);
@@ -65,7 +68,7 @@ public sealed class SegmentBar : FrameworkElement
             if (s.Active && !s.Finished && xDone >= x0)
                 dc.DrawRectangle(active, null, new Rect(Math.Max(0, xDone - 2), 0, 2, h));
             // Bölüm başlangıç işareti (IDM'deki kırmızı ayırıcı)
-            if (s.Start > 0)
+            if (ShowMarkers && s.Start > 0)
                 dc.DrawRectangle(marker, null, new Rect(Math.Max(0, x0 - 0.5), 0, 1.5, h));
             _ = xEnd;
         }

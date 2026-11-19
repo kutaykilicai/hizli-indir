@@ -20,7 +20,7 @@ public abstract class Observable : INotifyPropertyChanged
 }
 
 public enum DownloadStatus { Queued, Connecting, Downloading, Paused, Completed, Error, Merging }
-public enum DownloadKind { Http, Video }
+public enum DownloadKind { Http, Video, Torrent }
 
 /// <summary>Dosyanın bir bölümü. Start..End (dahil) aralığını tek bir bağlantı indirir.</summary>
 /// <summary>yt-dlp akış/parça durumu (görüntü+ses ve -N parçaları).</summary>
@@ -78,6 +78,10 @@ public sealed class DownloadItem : Observable
     /// <summary>Boyut tahmini (filesize_approx); listede ~ ile gösterilir.</summary>
     public bool SizeIsApprox { get; set; }
     public List<SegmentState> Segments { get; set; } = new();
+    /// <summary>Torrent: bilgi özeti, kayıtlı .torrent kopyası ve seçili dosya sıraları (null: hepsi).</summary>
+    public string? InfoHash { get; set; }
+    public string? TorrentPath { get; set; }
+    public List<int>? TorrentFiles { get; set; }
     public DateTime AddedAt { get; set; } = DateTime.Now;
     public DateTime? LastTryAt { get; set; }
     public DateTime? CompletedAt { get; set; }

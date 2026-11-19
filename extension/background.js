@@ -287,6 +287,9 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
       case "send-media":
         reply(await sendVideo({ pageUrl: msg.pageUrl, target: msg.url, title: msg.title, quality: msg.quality }, msg.pageUrl));
         break;
+      case "magnet":
+        reply(/^magnet:\?/i.test(msg.url || "") ? await native({ type: "torrent", magnet: msg.url }) : { ok: false });
+        break;
       case "open-app":
         reply(await native({ type: "show" }));
         break;

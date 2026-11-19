@@ -19,6 +19,42 @@ public static class Dialogs
         w.Activate();
     }
 
+    public static void AddTorrent(string? magnet, byte[]? data)
+    {
+        var w = new AddTorrentWindow(magnet, data);
+        w.Show();
+        w.Activate();
+    }
+
+    public static void AddTorrentFile(string path)
+    {
+        try
+        {
+            if (new FileInfo(path).Length > TorrentMeta.MaxBytes) { Info("Torrent dosyası çok büyük."); return; }
+            AddTorrent(null, File.ReadAllBytes(path));
+        }
+        catch (Exception ex) { Info("Torrent dosyası açılamadı: " + ex.Message); }
+    }
+
+    /// <summary>Web'deki .torrent dosyasını (çerez ve yönlendiren bilgisiyle) indirip torrent penceresini açar.</summary>
+    public static async void AddTorrentFromWeb(DownloadItem source)
+    {
+        try
+        {
+            using var req = Net.Build(source);
+            using var res = await Net.Client.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+            res.EnsureSuccessStatusCode();
+            if (res.Content.Headers.ContentLength > TorrentMeta.MaxBytes) throw new InvalidDataException("Torrent dosyası çok büyük");
+            var data = await res.Content.ReadAsByteArrayAsync();
+            AddTorrent(null, data);
+        }
+        catch (Exception ex)
+        {
+            Log.Write("Torrent indirilemedi: " + ex.Message);
+            Info("Torrent dosyası alınamadı: " + ex.Message);
+        }
+    }
+
     public static void Prepare(Window w)
     {
         w.Style = (Style)Application.Current.FindResource("BaseWindow");

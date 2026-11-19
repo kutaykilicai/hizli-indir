@@ -70,6 +70,8 @@ public sealed class AppSettings
     public string DefaultVideoQuality { get; set; } = "1080";
     public int VideoFragments { get; set; } = 16;
     public bool AutoUpdateYtDlp { get; set; } = true;
+    public int TorrentPort { get; set; } = 52413;
+    public bool TorrentSeedWhenDone { get; set; }
     public DateTime? LastYtDlpUpdate { get; set; }
 
     // Virüs denetimi
@@ -116,6 +118,8 @@ public sealed class AppSettings
                 new() { Name = "Video", Folder = Path.Combine(BaseFolder, "Video"), Extensions = "mp4 mkv avi mov wmv webm flv m4v mpg mpeg mpe 3gp ts ogv asf rm rmvb".Split(' ').ToList() },
             };
         }
+        if (!Categories.Any(c => c.Name == "Torrent"))
+            Categories.Add(new() { Name = "Torrent", Folder = Path.Combine(BaseFolder, "Torrent"), Extensions = new() { "torrent" } });
     }
 
     public string GeneralFolder => Path.Combine(BaseFolder, "Genel");

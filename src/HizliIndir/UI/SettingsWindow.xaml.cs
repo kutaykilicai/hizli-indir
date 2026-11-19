@@ -68,6 +68,7 @@ public partial class SettingsWindow : Window
         FragBox.Text = _s.VideoFragments.ToString(); YtUpdateBox.IsChecked = _s.AutoUpdateYtDlp;
         ToolsText.Text = Tools.Ready ? $"Hazır: {Paths.Tools}" : "yt-dlp, ffmpeg ve deno henüz indirilmedi. İlk video indirmesinde kendiliğinden indirilir.";
 
+        TorrentPortBox.Text = _s.TorrentPort.ToString(); TorrentSeedBox.IsChecked = _s.TorrentSeedWhenDone;
         SoundBox.IsChecked = _s.PlaySounds; SoundOk.Text = _s.SoundComplete ?? ""; SoundFail.Text = _s.SoundFailed ?? "";
         VirusBox.IsChecked = _s.VirusScanEnabled; VirusExe.Text = _s.VirusScanner; VirusArgs.Text = _s.VirusScannerArgs;
     }
@@ -82,7 +83,7 @@ public partial class SettingsWindow : Window
     void Nav_Changed(object sender, SelectionChangedEventArgs e)
     {
         if (Nav.SelectedItem is not ListBoxItem li) return;
-        foreach (var p in new FrameworkElement[] { General, Browser, Save, Connection, Proxy, Sites, Video, Extra })
+        foreach (var p in new FrameworkElement[] { General, Browser, Save, Connection, Proxy, Sites, Video, TorrentPage, Extra })
             p.Visibility = p.Name == (string)li.Tag ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -120,6 +121,7 @@ public partial class SettingsWindow : Window
         _s.DefaultVideoQuality = (QualityBox.SelectedItem as VideoChoice)?.Key ?? "1080";
         _s.VideoFragments = Int(FragBox.Text, 16, 1, 32); _s.AutoUpdateYtDlp = YtUpdateBox.IsChecked == true;
 
+        _s.TorrentPort = Int(TorrentPortBox.Text, 52413, 1024, 65535); _s.TorrentSeedWhenDone = TorrentSeedBox.IsChecked == true;
         _s.PlaySounds = SoundBox.IsChecked == true; _s.SoundComplete = NullIfEmpty(SoundOk.Text); _s.SoundFailed = NullIfEmpty(SoundFail.Text);
         _s.VirusScanEnabled = VirusBox.IsChecked == true; _s.VirusScanner = VirusExe.Text.Trim(); _s.VirusScannerArgs = VirusArgs.Text.Trim();
 

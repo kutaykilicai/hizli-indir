@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Hızlı İndir Tarayıcı Eklentisi",
   "short_name": "Hızlı İndir",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "İndirmeleri ve sayfadaki videoları Hızlı İndir'e gönderir.",
   "author": "Kutay Kılıç",
   "minimum_chrome_version": "116",

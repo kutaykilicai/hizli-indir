@@ -26,6 +26,7 @@ Ana pencerede indirmeler kategoriye ve duruma göre listelenir. Aşağıda solda
 - Pano izleme, toplu indirme (joker desen), site tarayıcı, vekil sunucu, site şifreleri, bitince ses ve virüs denetimi.
 - Chrome ve Edge eklentisi: indirmeleri yakalar, çerez, yönlendiren ve tarayıcı kimliğiyle uygulamaya aktarır. Videoların üzerinde "Bu videoyu indir" düğmesi çıkar.
 - YouTube ve diğer video siteleri için yt-dlp ve ffmpeg kullanılır. İkisi de ilk kullanımda indirilir ve günde bir kez güncellenir.
+- Torrent: `.torrent` dosyası ya da magnet bağlantısıyla indirme. Hangi dosyaların ineceğini seçersin, duraklatıp devam ettirebilirsin, uygulama kapanıp açılınca kaldığı yerden sürer. Motor olarak MonoTorrent kullanılır. Torrent içindeki dosya yolları indirmeden önce denetlenir; `..`, sürücü harfi ya da Windows'un ayrılmış adlarını içeren bir torrent hiç açılmaz.
 - Windows temasına uyan açık ve koyu görünüm, Mica arka plan, Türkçe arayüz, bildirim alanı simgesi.
 
 ## İndirme bitince bekleme olmaması
@@ -74,6 +75,19 @@ Eklentinin yaptıkları:
 - Sağ tık menüsü: bağlantıyı indir, sayfadaki tüm bağlantıları indir, seçili alandaki bağlantıları indir.
 - Video oynarken üstte mavi bir düğme çıkar. Tıklayınca kalite seçilir (en iyi, 4K, 1440p, 1080p, 720p, 480p, MP3, M4A). Alt ile tıklarsan varsayılan kaliteyle hemen başlar.
 
+## Torrent
+
+Torrent eklemenin dört yolu var:
+
+- Araç çubuğundaki **Torrent** düğmesiyle bir `.torrent` dosyası seç.
+- `.torrent` dosyasını ana pencereye sürükle.
+- Magnet bağlantısını **Adres ekle** penceresine yapıştır.
+- Eklenti yüklüyse sayfadaki magnet bağlantısına ya da `.torrent` indirmesine tıkla. Alt tuşu basılıyken tıklarsan tarayıcı kendisi açar.
+
+Magnet bağlantısında önce dosya listesi eşlerden istenir; bu birkaç saniye ile birkaç dakika arasında sürebilir. Liste gelince dosyaları seçip indirmeyi başlatırsın. İndirme bitince paylaşım varsayılan olarak durur, istersen Ayarlar > Torrent'ten açık bırakabilirsin. Genel hız sınırı torrentlere de uygulanır.
+
+Hızlı İndir dosya ilişkilendirmesi kurmaz ve `magnet:` bağlantılarını kendiliğinden üstlenmez. Torrent kopyaları ve kaldığı yerden devam bilgisi `%LOCALAPPDATA%\HizliIndir\torrent` altında tutulur. Yalnızca indirme hakkın olan içerikleri indir; Hızlı İndir herhangi bir torrent sitesi ya da arama hizmetiyle bağlantılı değildir.
+
 ## Varsayılan klasörler
 
 İndirmeler varsayılan olarak `%USERPROFILE%\Downloads` altına, kategoriye göre alt klasörlere iner. Yarım kalan `.hizli` dosyaları `%USERPROFILE%\Downloads\HizliIndir-Gecici` klasöründe tutulur. İkisi de Ayarlar > Kaydetme bölümünden değiştirilebilir; seçtiğin yollar `ayarlar.json` dosyasına yazılır ve güncellemelerde korunur.
@@ -86,11 +100,16 @@ src/HizliIndir/          WPF uygulaması
   UI/                    pencereler
   Themes/                açık/koyu tema ve denetim stilleri
 src/HizliIndir.Host/     tarayıcı ile uygulama arasındaki küçük köprü programı
+tests/HizliIndir.Tests/  torrent ayrıştırma, yol denetimi ve motor testleri (xUnit)
 extension/               Chrome/Edge eklentisi (Manifest V3)
 build.ps1                derleme ve kurulum betiği
 ```
 
 Veriler `%LOCALAPPDATA%\HizliIndir` altında durur: `ayarlar.json`, `indirmeler.json`, `kuyruklar.json`, `gunluk.txt` ve `tools` klasöründe yt-dlp, ffmpeg, deno.
+
+## Testler
+
+`dotnet test tests/HizliIndir.Tests` çevrimdışı testleri çalıştırır. Gerçek ağda kısa motor denemesi için `HIZLI_AG_TESTI=1` ortam değişkenini ver; bu deneme Ubuntu sunucu kalıbının torrentini birkaç yüz KB indirip durdurur ve magnet bağlantısından dosya listesini ister.
 
 ## Bilinen eksikler
 
@@ -104,7 +123,7 @@ Hızlı İndir bağımsız bir projedir, Internet Download Manager ya da Tonec i
 
 ## Lisans
 
-MIT. Ayrıntı için `LICENSE` dosyasına bak.
+MIT. Ayrıntı için `LICENSE` dosyasına bak. Torrent motoru [MonoTorrent](https://github.com/alanmcgovern/monotorrent) (MIT) NuGet paketi olarak kullanılır.
 
 ## English
 
@@ -113,5 +132,6 @@ Hızlı İndir is a multi-connection download manager for Windows (WPF, .NET 8) 
 - **Install:** download the zip from Releases and run `HizliIndir.exe`, or build with `powershell -ExecutionPolicy Bypass -File .\build.ps1 -Install` (needs the .NET 8 SDK).
 - **Extension:** load the `extension` folder as an unpacked extension in `chrome://extensions` or `edge://extensions`.
 - **Defaults:** downloads go to `%USERPROFILE%\Downloads`, partial files to `Downloads\HizliIndir-Gecici`; both can be changed in Settings.
+- **Torrents:** open a `.torrent` file or paste a magnet link, pick the files, pause and resume. Built on MonoTorrent (MIT). Unsafe file paths inside a torrent are rejected before anything is written.
 - **Disclaimer:** not affiliated with Internet Download Manager. Respect copyright and site terms when downloading videos.
 - **License:** MIT.
