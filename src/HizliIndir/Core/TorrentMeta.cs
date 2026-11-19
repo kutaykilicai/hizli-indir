@@ -22,7 +22,13 @@ public sealed class TorrentMeta
         if (data.Length == 0 || data.Length > MaxBytes) throw new InvalidDataException("Torrent dosyası geçersiz boyutta");
         BEncodedDictionary root;
         try { root = BEncodedValue.Decode<BEncodedDictionary>(data); }
-        catch (Exception ex) { throw new InvalidDataException("Torrent dosyası okunamadı: " + ex.Message); }
+        catch (Exception ex)
+        {
+            // Bencode sözlüğü 'e' ile biter; değilse dosyanın sonu kesilmiştir (yarım inmiş ya da sunucu eksik göndermiş).
+            if (data[^1] != (byte)'e')
+                throw new InvalidDataException($"Torrent dosyası eksik: {data.Length} bayt ve sonu kesik. Dosyayı kaynağından yeniden indirin.");
+            throw new InvalidDataException("Torrent dosyası okunamadı: " + ex.Message);
+        }
         if (Get(root, "info") is not BEncodedDictionary info) throw new InvalidDataException("Torrent dosyasında bilgi bölümü yok");
         CheckPaths(info);
         if (!Torrent.TryLoad(data, out var t) || t == null) throw new InvalidDataException("Torrent dosyası okunamadı");

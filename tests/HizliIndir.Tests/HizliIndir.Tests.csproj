@@ -10,6 +10,7 @@
     <Compile Include="..\..\src\HizliIndir\Core\SafePath.cs" Link="Core\SafePath.cs" />
     <Compile Include="..\..\src\HizliIndir\Core\TorrentMeta.cs" Link="Core\TorrentMeta.cs" />
     <Compile Include="..\..\src\HizliIndir\Core\TorrentEngine.cs" Link="Core\TorrentEngine.cs" />
+    <Compile Include="..\..\src\HizliIndir\Core\TorrentFetch.cs" Link="Core\TorrentFetch.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />

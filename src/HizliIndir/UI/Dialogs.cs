@@ -31,7 +31,20 @@ public static class Dialogs
         try
         {
             if (new FileInfo(path).Length > TorrentMeta.MaxBytes) { Info("Torrent dosyası çok büyük."); return; }
-            AddTorrent(null, File.ReadAllBytes(path));
+            var data = File.ReadAllBytes(path);
+            try { TorrentMeta.Parse(data); }
+            catch (InvalidDataException ex)
+            {
+                // Eski sürümün bölümlü indirmesiyle yarım kalmış bir .torrent ise kaynağından tek istekle yeniden al.
+                var full = Path.GetFullPath(path);
+                var source = App.Manager.Items.FirstOrDefault(i => i.Kind == DownloadKind.Http && string.Equals(i.FullPath, full, StringComparison.OrdinalIgnoreCase)
+                    && Uri.TryCreate(i.Url, UriKind.Absolute, out var u) && u.Scheme is "http" or "https");
+                if (source == null) throw;
+                Log.Write($"Torrent dosyası bozuk ({ex.Message}); kaynağından yeniden alınıyor");
+                AddTorrentFromWeb(source);
+                return;
+            }
+            AddTorrent(null, data);
         }
         catch (Exception ex) { Info("Torrent dosyası açılamadı: " + ex.Message); }
     }
@@ -42,11 +55,8 @@ public static class Dialogs
         try
         {
             using var req = Net.Build(source);
-            using var res = await Net.Client.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
-            res.EnsureSuccessStatusCode();
-            if (res.Content.Headers.ContentLength > TorrentMeta.MaxBytes) throw new InvalidDataException("Torrent dosyası çok büyük");
-            var data = await res.Content.ReadAsByteArrayAsync();
-            AddTorrent(null, data);
+            var meta = await TorrentFetch.DownloadAsync(Net.Client, req);
+            AddTorrent(null, meta.Bytes);
         }
         catch (Exception ex)
         {

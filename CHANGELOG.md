@@ -1,5 +1,12 @@
 # Değişiklikler
 
+## 1.1.2
+
+- "Invalid BEncodedString" hatasıyla açılmayan .torrent dosyaları için düzeltme. Sorunlu dosyalar diskte zaten yarımdı: 1.1.0 öncesinde .torrent bağlantıları sıradan dosya gibi bölümlü indiriliyordu ve kaydedilen dosya, içinde bildirilen parça listesinden çok daha kısa kalmıştı.
+- Web'den gelen .torrent dosyası (eklentinin yakaladığı, adres olarak eklenen) artık tek istekle sonuna kadar okunuyor. Bildirilen boyuttan az veri gelirse, bağlantı yarıda koparsa ya da sunucu torrent yerine web sayfası döndürürse açık bir Türkçe hata gösteriliyor. Sıkıştırılmış (gzip, deflate, br) yanıtlar da açılıyor.
+- Dosyadan açarken ya da sürükleyip bırakırken torrent yarımsa ve dosya Hızlı İndir ile indirilmişse, kaynak adresinden yeniden alınıyor. Kaynağı bilinmeyen yarım dosyada "dosya eksik, yeniden indirin" uyarısı çıkıyor.
+- Testler: kesik dosya, 100 KB'tan büyük torrent, parça parça inen, uzunluğu bildirilmeyen, sıkıştırılmış, yarıda kopan ve HTML dönen URL indirmeleri.
+
 ## 1.1.1
 
 - Magnet bağlantılarında dosya listesinin hiç gelmemesi düzeltildi. MonoTorrent DHT'yi yalnızca router.bittorrent.com ile başlatıyordu; bu sunucu yanıt vermeyince DHT hiç düğüm bulamıyor, eşleri yalnızca DHT'de olan magnet bağlantıları (Ubuntu'nun tracker'ı yalnızca kendi sunucusunu veriyor) üç dakika sonra zaman aşımına düşüyordu. Artık motor ilk çalışmadan önce dht.transmissionbt.com, dht.libtorrent.org, router.bittorrent.com ve router.utorrent.com başlangıç düğümü olarak ekleniyor.
