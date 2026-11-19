@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography;
 using MonoTorrent;
 using MonoTorrent.Client;
 
@@ -35,6 +37,59 @@ public sealed class TorrentEngine : IDisposable
         Engine = new ClientEngine(b.ToSettings());
     }
 
+    // MonoTorrent DHT'yi yalnızca router.bittorrent.com ile başlatıyor; o yanıt vermezse DHT hiç
+    // düğüm bulamıyor ve yalnızca DHT'de eşi olan magnet bağlantıları dosya bilgisini alamıyor.
+    // Bu yüzden motor ilk kez çalışmadan önce bilinen başlangıç düğümleri önbellek dosyasına eklenir.
+    public static readonly (string Host, int Port)[] DhtRouters =
+    {
+        ("dht.transmissionbt.com", 6881), ("dht.libtorrent.org", 25401), ("router.bittorrent.com", 6881), ("router.utorrent.com", 6881),
+    };
+    const int NodeSize = 26; // 20 bayt kimlik + 4 bayt IPv4 + 2 bayt bağlantı noktası
+    readonly object _seedGate = new();
+    Task? _dhtSeed;
+
+    Task EnsureDhtSeedAsync() { lock (_seedGate) return _dhtSeed ??= SeedDhtCacheAsync(); }
+
+    async Task SeedDhtCacheAsync()
+    {
+        try
+        {
+            var routers = new List<IPEndPoint>();
+            foreach (var (host, port) in DhtRouters)
+            {
+                var lookup = Dns.GetHostAddressesAsync(host);
+                if (await Task.WhenAny(lookup, Task.Delay(3000)) != lookup || lookup.IsFaulted) continue;
+                routers.AddRange(lookup.Result.Where(a => a.AddressFamily == AddressFamily.InterNetwork).Select(a => new IPEndPoint(a, port)));
+            }
+            var path = Path.Combine(Options.StateFolder, "dht_nodes.cache");
+            var old = File.Exists(path) ? await File.ReadAllBytesAsync(path) : Array.Empty<byte>();
+            await File.WriteAllBytesAsync(path, MergeDhtCache(old, routers));
+        }
+        catch { /* DHT önbelleği olmadan da tracker'larla çalışır */ }
+    }
+
+    /// <summary>Önbellekteki düğümleri (ham ya da "uzunluk:" önekli) korur, eksik başlangıç düğümlerini ekler.</summary>
+    public static byte[] MergeDhtCache(byte[] existing, IEnumerable<IPEndPoint> routers)
+    {
+        var data = existing.AsSpan();
+        int colon = data.IndexOf((byte)':');
+        if (colon > 0 && colon < 10 && data[..colon].ToArray().All(b => b is >= (byte)'0' and <= (byte)'9')) data = data[(colon + 1)..];
+        if (data.Length % NodeSize != 0) data = Span<byte>.Empty;
+        var result = new List<byte>(data.ToArray());
+        var have = new HashSet<string>();
+        for (int i = 0; i + NodeSize <= data.Length; i += NodeSize) have.Add(Convert.ToHexString(data.Slice(i + 20, 6)));
+        foreach (var ep in routers)
+        {
+            var addr = ep.Address.GetAddressBytes();
+            if (addr.Length != 4) continue;
+            var tail = addr.Concat(new[] { (byte)(ep.Port >> 8), (byte)ep.Port }).ToArray();
+            if (!have.Add(Convert.ToHexString(tail))) continue;
+            result.AddRange(RandomNumberGenerator.GetBytes(20));
+            result.AddRange(tail);
+        }
+        return result.ToArray();
+    }
+
     static int Rate(long bps) => (int)Math.Clamp(bps, 0, int.MaxValue);
 
     public Task SetLimitsAsync(long downBps, long upBps)
@@ -47,6 +102,7 @@ public sealed class TorrentEngine : IDisposable
     public async Task<TorrentMeta> FetchMetadataAsync(string magnet, TimeSpan timeout, CancellationToken ct)
     {
         if (!MagnetLink.TryParse(magnet.Trim(), out var link) || link == null) throw new InvalidDataException("Magnet bağlantısı geçersiz");
+        await EnsureDhtSeedAsync();
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(timeout);
         try
@@ -66,6 +122,7 @@ public sealed class TorrentEngine : IDisposable
     /// <summary>Torrenti motora ekler (zaten varsa olanı döner) ve yalnızca seçili dosyaları indirilecek işaretler.</summary>
     public async Task<TorrentManager> AddAsync(TorrentMeta meta, string saveFolder, IReadOnlyCollection<int>? selected)
     {
+        await EnsureDhtSeedAsync();
         var m = Find(meta.InfoHash);
         if (m == null)
         {

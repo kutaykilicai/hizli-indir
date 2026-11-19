@@ -1,5 +1,10 @@
 # Değişiklikler
 
+## 1.1.1
+
+- Magnet bağlantılarında dosya listesinin hiç gelmemesi düzeltildi. MonoTorrent DHT'yi yalnızca router.bittorrent.com ile başlatıyordu; bu sunucu yanıt vermeyince DHT hiç düğüm bulamıyor, eşleri yalnızca DHT'de olan magnet bağlantıları (Ubuntu'nun tracker'ı yalnızca kendi sunucusunu veriyor) üç dakika sonra zaman aşımına düşüyordu. Artık motor ilk çalışmadan önce dht.transmissionbt.com, dht.libtorrent.org, router.bittorrent.com ve router.utorrent.com başlangıç düğümü olarak ekleniyor.
+- DHT önbelleği okunurken uzunluk önekli kayıtlar da tanınıyor.
+
 ## 1.1.0
 
 - Torrent desteği eklendi. `.torrent` dosyası ya da magnet bağlantısıyla indirme başlatılabiliyor.

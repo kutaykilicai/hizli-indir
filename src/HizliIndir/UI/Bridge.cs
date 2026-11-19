@@ -132,7 +132,7 @@ public static class Bridge
         {
             ["ok"] = true,
             ["app"] = "Hızlı İndir",
-            ["version"] = "1.1.0",
+            ["version"] = "1.1.1",
             ["capture"] = new JsonArray(s.CaptureExtensions.Select(x => (JsonNode)x).ToArray()),
             ["skipSites"] = new JsonArray(s.SkipSites.Select(x => (JsonNode)x).ToArray()),
             ["noPanelSites"] = new JsonArray(s.NoVideoPanelSites.Select(x => (JsonNode)x).ToArray()),
