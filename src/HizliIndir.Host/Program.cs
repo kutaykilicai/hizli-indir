@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
 
@@ -44,11 +44,24 @@ string Forward(string json)
         }
         if (attempt == 0)
         {
+            // Ayar okuma ve durum sorgusu uygulamayı başlatmaz; yalnızca gerçek bir iş gelince açılır.
+            if (!NeedsApp(json)) return "{\"ok\":false,\"error\":\"Hızlı İndir kapalı\"}";
             if (!File.Exists(appExe)) return "{\"ok\":false,\"error\":\"Hızlı İndir bulunamadı\"}";
             Launcher.Start(appExe, "--tray");
         }
     }
     return "{\"ok\":false,\"error\":\"Hızlı İndir'e bağlanılamadı\"}";
+}
+
+static bool NeedsApp(string json)
+{
+    try
+    {
+        using var d = System.Text.Json.JsonDocument.Parse(json);
+        var t = d.RootElement.TryGetProperty("type", out var v) ? v.GetString() : null;
+        return t is not ("config" or "ping");
+    }
+    catch { return true; }
 }
 
 static string? ReadMessage(Stream s)
